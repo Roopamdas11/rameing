@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320">
+  <rect width="100%" height="100%" fill="#071012" rx="14"/>
+  <rect x="20" y="20" width="520" height="280" rx="10" fill="#ff2d78" opacity="0.05"/>
+  <text x="40" y="90" font-family="Orbitron, sans-serif" font-size="38" fill="#ffdf7a">Paper Defence</text>
+  <text x="40" y="140" font-family="Rajdhani, sans-serif" font-size="18" fill="#ffdca8">Build your paper fortress. Survive endless origami waves.</text>
+  <text x="40" y="210" font-family="Space Mono, monospace" font-size="14" fill="#d8c1a8">Play · Defend · Strategize</text>
+  <text x="40" y="260" font-family="Rajdhani, sans-serif" font-size="12" fill="#bda48a">paperdefence.rameing.com</text>
+</svg>

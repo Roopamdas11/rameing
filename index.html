@@ -95,7 +95,8 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .rame-card{flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;height:calc(100svh - var(--th) - var(--bh) - var(--safe));}
 .rc-bg{position:absolute;inset:0;z-index:0;}
 .rc-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;z-index:1;}
-.rc-art{position:absolute;right:-10px;top:10px;font-size:140px;opacity:.07;pointer-events:none;z-index:1;filter:blur(2px);}
+.rc-art{position:absolute;right:-10px;top:10px;font-size:140px;opacity:.07;pointer-events:none;z-index:1;filter:blur(2px);} 
+.rc-poster{width:140px;height:auto;border-radius:12px;margin-bottom:12px;box-shadow:0 6px 24px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.04)}
 .rc-content{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:28px 22px 22px;}
 /* card colours */
 .rame-card:nth-child(1) .rc-bg{background:radial-gradient(ellipse at 20% 80%,rgba(0,255,136,.14) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,212,255,.09) 0%,transparent 60%),linear-gradient(160deg,#0a0a14,#050a0a);}
@@ -428,45 +429,12 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
     </div>
 
-    <!-- RAME 1 -->
-    <article class="rame-card" data-id="paper-defence">
-      <div class="rc-bg"></div><div class="rc-grid"></div>
-      <div class="rc-art">🛡️</div>
-      <div class="rc-content">
-        <div class="badge"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span> Tower Defense</div>
-        <h2 class="rc-title">Paper Defence</h2>
-        <p class="rc-desc">Build your paper fortress. Protect against endless waves of origami invaders in this addictive minimalist tower defense experience.</p>
-        <div class="rc-creator" onclick="openCreatorProfile()">
-          <div class="av-circle">PD</div>
-          <div class="rc-handle"><strong>@papercraft_dev</strong><span>rameing.com/papercraft_dev</span></div>
-        </div>
-        <div class="rc-stats">
-          <div class="stat-item">🏆 <span class="stat-n">2.4K</span><span class="stat-l">trophies</span></div>
-          <div class="stat-item">👥 <span class="stat-n">847</span><span class="stat-l">players</span></div>
-        </div>
-        <div class="rc-cta">
-          <a href="https://paperdefence.rameing.com" target="_blank" class="play-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>PLAY NOW
-          </a>
-          <button class="act-btn" id="like-paper-defence" onclick="toggleLike('paper-defence',this)" title="Like">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </button>
-          <button class="act-btn" onclick="openComments('paper-defence','Paper Defence')" title="Comment">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          </button>
-          <button class="act-btn" onclick="share('Paper Defence','https://paperdefence.rameing.com')" title="Share">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="glow-bar"></div>
-    </article>
-
-    <!-- RAME 2 -->
+    <!-- RAME 1 (moved): PD1 -->
     <article class="rame-card" data-id="pd1">
       <div class="rc-bg"></div><div class="rc-grid"></div>
       <div class="rc-art">⚡</div>
       <div class="rc-content">
+        <img class="rc-poster" src="assets/poster-pd1.svg" alt="PD1 Poster">
         <div class="badge"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span> Challenge</div>
         <h2 class="rc-title">PD1</h2>
         <p class="rc-desc">The ultimate skill challenge. How long can you last? Compete against friends and climb the global leaderboard. One shot. One chance.</p>
@@ -489,6 +457,41 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </button>
           <button class="act-btn" onclick="share('PD1','https://pd1.rameing.com')" title="Share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="glow-bar"></div>
+    </article>
+
+    <!-- RAME 2 (moved): Paper Defence -->
+    <article class="rame-card" data-id="paper-defence">
+      <div class="rc-bg"></div><div class="rc-grid"></div>
+      <div class="rc-art">🛡️</div>
+      <div class="rc-content">
+        <img class="rc-poster" src="assets/poster-paper-defence.svg" alt="Paper Defence Poster">
+        <div class="badge"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span> Tower Defense</div>
+        <h2 class="rc-title">Paper Defence</h2>
+        <p class="rc-desc">Build your paper fortress. Protect against endless waves of origami invaders in this addictive minimalist tower defense experience.</p>
+        <div class="rc-creator" onclick="openCreatorProfile()">
+          <div class="av-circle">PD</div>
+          <div class="rc-handle"><strong>@papercraft_dev</strong><span>rameing.com/papercraft_dev</span></div>
+        </div>
+        <div class="rc-stats">
+          <div class="stat-item">🏆 <span class="stat-n">2.4K</span><span class="stat-l">trophies</span></div>
+          <div class="stat-item">👥 <span class="stat-n">847</span><span class="stat-l">players</span></div>
+        </div>
+        <div class="rc-cta">
+          <a href="https://paperdefence.rameing.com" target="_blank" class="play-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>PLAY NOW
+          </a>
+          <button class="act-btn" id="like-paper-defence" onclick="toggleLike('paper-defence',this)" title="Like">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="act-btn" onclick="openComments('paper-defence','Paper Defence')" title="Comment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="act-btn" onclick="share('Paper Defence','https://paperdefence.rameing.com')" title="Share">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           </button>
         </div>
