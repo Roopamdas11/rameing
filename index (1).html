@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Rameing — Play. Challenge. Reign.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleAuth()"></script>
+<style>
+:root {
+  --bg:#050508;--surface:#0d0d14;--s2:#141420;--s3:#1c1c2c;
+  --green:#00ff88;--pink:#ff2d78;--blue:#00d4ff;--yellow:#ffe600;
+  --text:#f0f0ff;--muted:#6b6b8a;--border:rgba(255,255,255,.07);
+  --gg:0 0 20px rgba(0,255,136,.4);--gp:0 0 20px rgba(255,45,120,.4);
+  --gb:0 0 20px rgba(0,212,255,.4);
+  --sw:240px;--th:56px;--bh:64px;
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999;}
+
+/* TOP BAR */
+.top-bar{position:fixed;top:0;left:0;right:0;height:var(--th);background:rgba(5,5,8,.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200;border-bottom:1px solid var(--border);}
+.logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.25rem;letter-spacing:.1em;color:var(--green);text-shadow:var(--gg);text-decoration:none;cursor:pointer;}
+.logo span{color:var(--pink);text-shadow:var(--gp);}
+.top-actions{display:flex;gap:6px;align-items:center;}
+.icon-btn{background:none;border:none;color:var(--muted);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s;}
+.icon-btn:hover{background:rgba(255,255,255,.08);color:var(--text);}
+.icon-btn svg{width:20px;height:20px;}
+.notif-wrap{position:relative;}
+.n-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--pink);box-shadow:var(--gp);border:2px solid var(--bg);}
+.avatar-btn{width:34px;height:34px;border-radius:50%;overflow:hidden;border:2px solid var(--green);cursor:pointer;background:none;padding:0;flex-shrink:0;box-shadow:var(--gg);transition:transform .2s;}
+.avatar-btn:hover{transform:scale(1.05);}
+.av-i{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-weight:700;font-size:.65rem;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;}
+
+/* SIDEBAR */
+.sidebar{display:none;position:fixed;left:0;top:0;bottom:0;width:var(--sw);background:var(--surface);border-right:1px solid var(--border);flex-direction:column;padding:24px 12px;z-index:200;}
+.sidebar .logo{display:block;padding:8px 12px 28px;font-size:1.4rem;}
+.nav-links{display:flex;flex-direction:column;gap:2px;flex:1;}
+.nav-link{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.95rem;letter-spacing:.04em;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;text-align:left;position:relative;}
+.nav-link svg{width:20px;height:20px;flex-shrink:0;}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.05);}
+.nav-link.active{color:var(--green);}
+.sb-badge{width:7px;height:7px;border-radius:50%;background:var(--pink);position:absolute;left:26px;top:10px;}
+.sb-user{margin-top:auto;padding:12px;background:var(--s2);border-radius:12px;border:1px solid var(--border);}
+.sb-user-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sb-av{width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--green);}
+.sb-av .av-i{font-size:.6rem;}
+.sb-name{font-weight:700;font-size:.9rem;line-height:1.2;}
+.sb-handle{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);}
+.sb-stats{display:flex;gap:14px;margin-bottom:10px;}
+.sbs .n{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:var(--green);}
+.sbs .l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.sb-login-btn{display:block;text-align:center;padding:11px;border-radius:10px;background:linear-gradient(135deg,var(--pink),#b5006a);color:#fff;font-family:'Orbitron',monospace;font-weight:700;font-size:.75rem;letter-spacing:.1em;cursor:pointer;border:none;transition:all .2s;box-shadow:var(--gp);}
+.sb-login-btn:hover{transform:translateY(-2px);}
+.sb-logout{display:block;width:100%;padding:9px;border-radius:8px;background:rgba(255,45,120,.08);color:var(--pink);font-family:'Orbitron',monospace;font-size:.68rem;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,45,120,.2);cursor:pointer;transition:all .2s;}
+.sb-logout:hover{background:rgba(255,45,120,.16);}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--bh) + var(--safe));background:rgba(13,13,20,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;padding-bottom:var(--safe);z-index:200;}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:all .2s;cursor:pointer;background:none;border:none;padding:6px 10px;border-radius:8px;position:relative;}
+.bn-item.active{color:var(--green);}
+.bn-item svg{width:22px;height:22px;}
+.bn-badge{position:absolute;top:2px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--pink);border:2px solid var(--bg);}
+
+/* APP SHELL */
+.app{position:fixed;inset:0;padding-top:var(--th);padding-bottom:calc(var(--bh) + var(--safe));overflow:hidden;}
+.view{display:none;height:100%;flex-direction:column;overflow-y:auto;overflow-x:hidden;}
+.view.active{display:flex;}
+.view::-webkit-scrollbar{width:3px;}
+.view::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+
+/* ═══ FEED VIEW — snap scroll ═══ */
+#feed-view{overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;}
+#feed-view::-webkit-scrollbar{display:none;}
+
+/* Feed header is snap point 0 — scrolls away to reveal full card */
+.feed-header{scroll-snap-align:start;scroll-snap-stop:normal;flex-shrink:0;padding:20px 20px 14px;background:linear-gradient(180deg,var(--bg) 80%,transparent);}
+.feed-eyebrow{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:var(--green);text-transform:uppercase;display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--green);}50%{opacity:.35;box-shadow:none;}}
+.feed-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(1.1rem,4vw,1.6rem);margin-bottom:14px;}
+.feed-title span{color:var(--green);}
+.chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:5px 14px;border-radius:20px;font-size:.82rem;font-weight:600;white-space:nowrap;cursor:pointer;transition:all .2s;border:none;}
+.chip.on{background:var(--green);color:#000;}
+.chip.off{background:var(--s2);color:var(--muted);border:1px solid var(--border);}
+.chip.off:hover{color:var(--text);}
+
+/* RAME CARDS — each fills the viewport height when snapped */
+.rame-card{flex-shrink:0;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;height:calc(100svh - var(--th) - var(--bh) - var(--safe));}
+.rc-bg{position:absolute;inset:0;z-index:0;}
+.rc-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:40px 40px;z-index:1;}
+.rc-art{position:absolute;right:-10px;top:10px;font-size:140px;opacity:.07;pointer-events:none;z-index:1;filter:blur(2px);}
+.rc-content{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:28px 22px 22px;}
+/* card colours */
+.rame-card:nth-child(1) .rc-bg{background:radial-gradient(ellipse at 20% 80%,rgba(0,255,136,.14) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(0,212,255,.09) 0%,transparent 60%),linear-gradient(160deg,#0a0a14,#050a0a);}
+.rame-card:nth-child(2) .rc-bg{background:radial-gradient(ellipse at 80% 80%,rgba(255,45,120,.14) 0%,transparent 60%),radial-gradient(ellipse at 20% 20%,rgba(255,230,0,.07) 0%,transparent 60%),linear-gradient(160deg,#0f0a14,#0a0508);}
+.rame-card:nth-child(1) .badge{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:var(--green);}
+.rame-card:nth-child(2) .badge{background:rgba(255,45,120,.1);border:1px solid rgba(255,45,120,.3);color:var(--pink);}
+.rame-card:nth-child(1) .stat-n{color:var(--green);}
+.rame-card:nth-child(2) .stat-n{color:var(--pink);}
+.rame-card:nth-child(1) .play-btn{background:var(--green);color:#000;box-shadow:0 0 28px rgba(0,255,136,.35);}
+.rame-card:nth-child(1) .play-btn:hover{box-shadow:0 0 50px rgba(0,255,136,.55);transform:scale(1.03);}
+.rame-card:nth-child(2) .play-btn{background:var(--pink);color:#fff;box-shadow:0 0 28px rgba(255,45,120,.35);}
+.rame-card:nth-child(2) .play-btn:hover{box-shadow:0 0 50px rgba(255,45,120,.55);transform:scale(1.03);}
+.rame-card:nth-child(1) .av-circle{background:linear-gradient(135deg,var(--green),#009952);color:#000;}
+.rame-card:nth-child(2) .av-circle{background:linear-gradient(135deg,var(--pink),#8b0035);color:#fff;}
+.rame-card:nth-child(1) .glow-bar{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.rame-card:nth-child(2) .glow-bar{background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:20px;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;width:fit-content;}
+.rc-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(1.8rem,7vw,2.8rem);line-height:1.05;margin-bottom:12px;}
+.rc-desc{font-size:.95rem;color:rgba(240,240,255,.6);line-height:1.6;max-width:360px;margin-bottom:20px;}
+.rc-creator{display:flex;align-items:center;gap:10px;margin-bottom:auto;cursor:pointer;}
+.av-circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-weight:700;font-size:.7rem;flex-shrink:0;}
+.rc-handle strong{display:block;font-size:.85rem;color:var(--text);}
+.rc-handle span{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted);}
+.rc-stats{display:flex;gap:18px;padding:13px 16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;margin:16px 0;}
+.stat-item{display:flex;align-items:center;gap:7px;font-weight:600;font-size:.85rem;}
+.stat-n{font-family:'Orbitron',monospace;font-size:1.05rem;font-weight:700;}
+.stat-l{color:var(--muted);font-size:.78rem;}
+.rc-cta{display:flex;gap:10px;align-items:center;}
+.play-btn{display:flex;align-items:center;gap:9px;padding:13px 24px;border-radius:50px;font-family:'Orbitron',monospace;font-weight:700;font-size:.8rem;letter-spacing:.1em;text-decoration:none;border:none;cursor:pointer;transition:all .25s;flex:1;justify-content:center;}
+.act-btn{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .2s;flex-shrink:0;}
+.act-btn:hover{background:rgba(255,255,255,.12);color:var(--text);}
+.act-btn.liked{color:var(--pink);border-color:rgba(255,45,120,.3);}
+.act-btn svg{width:17px;height:17px;}
+.glow-bar{position:absolute;bottom:0;left:0;right:0;height:2px;animation:gbar 3s ease-in-out infinite;}
+@keyframes gbar{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+/* ═══ SEARCH ═══ */
+.search-wrap{padding:20px 20px 12px;flex-shrink:0;}
+.search-box{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:0 16px;height:46px;margin-bottom:14px;transition:border-color .2s;}
+.search-box:focus-within{border-color:rgba(0,255,136,.3);}
+.search-box svg{width:18px;height:18px;color:var(--muted);flex-shrink:0;}
+.search-box input{background:none;border:none;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:600;flex:1;outline:none;}
+.search-box input::placeholder{color:var(--muted);}
+.s-scroll{flex:1;overflow-y:auto;padding:0 20px 20px;}
+.s-scroll::-webkit-scrollbar{width:3px;}
+.s-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.s-label{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:12px;margin-top:4px;}
+.s-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.s-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;transition:all .2s;text-decoration:none;display:block;}
+.s-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px);}
+.s-card-em{font-size:2rem;display:block;margin-bottom:8px;}
+.s-card-name{font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;color:var(--text);display:block;margin-bottom:3px;}
+.s-card-sub{font-size:.73rem;color:var(--muted);}
+.creator-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.creator-row:hover{border-color:rgba(255,255,255,.14);}
+.cr-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-weight:700;font-size:.75rem;flex-shrink:0;}
+.cr-name{font-weight:700;font-size:.95rem;}
+.cr-sub{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);}
+.follow-pill{padding:6px 16px;border-radius:20px;font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;letter-spacing:.07em;cursor:pointer;transition:all .2s;border:none;white-space:nowrap;}
+.follow-pill.f0{background:var(--green);color:#000;}
+.follow-pill.f0:hover{box-shadow:var(--gg);}
+.follow-pill.f1{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3);}
+.no-results{display:none;text-align:center;padding:60px 20px;color:var(--muted);}
+.no-results-icon{font-size:3rem;margin-bottom:12px;}
+.no-results-text{font-family:'Orbitron',monospace;font-size:.88rem;}
+
+/* ═══ NOTIFICATIONS ═══ */
+.notifs-pad{padding:20px 16px 20px;}
+.notifs-title{font-family:'Orbitron',monospace;font-weight:900;font-size:1.2rem;margin-bottom:20px;}
+.notif-group{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;margin-top:16px;}
+.notif-item{display:flex;align-items:center;gap:12px;padding:12px 12px;border-radius:12px;margin-bottom:5px;cursor:pointer;transition:background .2s;}
+.notif-item:hover{background:rgba(255,255,255,.04);}
+.notif-item.unread{background:rgba(0,255,136,.04);border-left:2px solid var(--green);padding-left:10px;}
+.notif-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;background:var(--s2);}
+.notif-body{flex:1;font-size:.88rem;line-height:1.45;}
+.notif-body strong{color:var(--text);font-weight:700;}
+.notif-body span{color:var(--muted);}
+.notif-time{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);flex-shrink:0;}
+
+/* ═══ PROFILE ═══ */
+.profile-inner{padding:24px 20px 20px;max-width:560px;margin:0 auto;width:100%;}
+.back-btn{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);cursor:pointer;margin-bottom:20px;background:none;border:none;font-family:'Rajdhani',sans-serif;font-weight:600;transition:color .2s;padding:0;}
+.back-btn:hover{color:var(--text);}
+.back-btn svg{width:18px;height:18px;}
+.prof-head{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:26px;}
+.prof-av{width:86px;height:86px;border-radius:50%;overflow:hidden;border:2.5px solid var(--green);box-shadow:var(--gg);margin-bottom:14px;}
+.prof-av .av-i{font-size:1.5rem;}
+.prof-av img{width:100%;height:100%;object-fit:cover;}
+.prof-name{font-family:'Orbitron',monospace;font-weight:900;font-size:1.3rem;margin-bottom:3px;}
+.prof-username{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--muted);margin-bottom:10px;}
+.prof-bio{font-size:.9rem;color:rgba(240,240,255,.6);max-width:300px;line-height:1.6;margin-bottom:16px;}
+.prof-stats{display:flex;gap:28px;margin-bottom:18px;}
+.pst .n{font-family:'Orbitron',monospace;font-weight:900;font-size:1.3rem;color:var(--green);display:block;}
+.pst .l{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.prof-actions{display:flex;gap:10px;}
+.follow-big{padding:9px 28px;border-radius:50px;font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;letter-spacing:.1em;border:none;cursor:pointer;transition:all .2s;}
+.follow-big.fol{background:var(--green);color:#000;box-shadow:var(--gg);}
+.follow-big.fol:hover{transform:scale(1.04);}
+.follow-big.fing{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3);}
+.msg-big{padding:9px 20px;border-radius:50px;font-family:'Orbitron',monospace;font-size:.72rem;font-weight:700;letter-spacing:.1em;background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border);cursor:pointer;transition:all .2s;}
+.msg-big:hover{border-color:rgba(255,255,255,.2);}
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.game-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;text-decoration:none;display:block;transition:all .2s;}
+.game-card:hover{border-color:rgba(0,255,136,.3);transform:translateY(-2px);}
+.gc-em{font-size:2.2rem;display:block;margin-bottom:7px;}
+.gc-name{font-family:'Orbitron',monospace;font-size:.75rem;font-weight:700;color:var(--text);display:block;margin-bottom:3px;}
+.gc-score{font-size:.7rem;color:var(--green);font-family:'Space Mono',monospace;}
+/* own profile */
+.own-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:16px;background:var(--s2);border-radius:14px;border:1px solid var(--border);margin-bottom:20px;}
+.ops{text-align:center;}
+.ops .n{font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;color:var(--green);display:block;}
+.ops .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.section-lbl{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:12px;margin-top:4px;}
+.logout-btn{display:block;width:100%;padding:10px;border-radius:10px;background:rgba(255,45,120,.08);color:var(--pink);font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,45,120,.2);cursor:pointer;transition:all .2s;margin-top:14px;}
+.logout-btn:hover{background:rgba(255,45,120,.16);}
+
+/* ═══ VISION ═══ */
+.vision-page{padding:32px 20px 60px;max-width:680px;margin:0 auto;}
+.v-eyebrow{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--blue);margin-bottom:16px;}
+.v-h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(2rem,7vw,3.2rem);line-height:1.05;margin-bottom:16px;}
+.v-h1 .g{color:var(--green);text-shadow:var(--gg);}
+.v-h1 .p{color:var(--pink);text-shadow:var(--gp);}
+.v-h1 .b{color:var(--blue);text-shadow:var(--gb);}
+.v-lead{font-size:1rem;color:rgba(240,240,255,.55);max-width:480px;line-height:1.7;margin-bottom:28px;}
+.v-quote{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;margin-bottom:28px;position:relative;overflow:hidden;}
+.v-quote::before{content:'"';position:absolute;top:-22px;left:14px;font-size:110px;color:rgba(0,255,136,.04);font-family:'Orbitron',monospace;font-weight:900;pointer-events:none;}
+.v-quote p{font-size:1.02rem;line-height:1.8;color:rgba(240,240,255,.7);position:relative;z-index:1;}
+.v-quote strong{color:var(--green);}
+.v-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+@media(max-width:420px){.v-grid{grid-template-columns:1fr;}}
+.v-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;transition:all .3s;}
+.v-card:hover{border-color:rgba(255,255,255,.14);transform:translateY(-3px);}
+.v-card::before{content:'';display:block;height:2px;border-radius:2px;margin-bottom:14px;}
+.v-card:nth-child(1)::before{background:linear-gradient(90deg,var(--green),transparent);}
+.v-card:nth-child(2)::before{background:linear-gradient(90deg,var(--pink),transparent);}
+.v-card:nth-child(3)::before{background:linear-gradient(90deg,var(--blue),transparent);}
+.v-card:nth-child(4)::before{background:linear-gradient(90deg,var(--yellow),transparent);}
+.v-card-icon{font-size:1.8rem;margin-bottom:8px;}
+.v-card h3{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;margin-bottom:6px;letter-spacing:.04em;}
+.v-card p{font-size:.85rem;color:var(--muted);line-height:1.6;}
+.rm-lbl{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:18px;}
+.timeline{display:flex;flex-direction:column;}
+.tl-i{display:flex;gap:18px;padding-bottom:26px;}
+.tl-i:last-child{padding-bottom:0;}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.tl-dot{width:11px;height:11px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.tl-i:nth-child(1) .tl-dot{background:var(--green);box-shadow:var(--gg);}
+.tl-i:nth-child(2) .tl-dot{background:var(--pink);box-shadow:var(--gp);}
+.tl-i:nth-child(3) .tl-dot{background:var(--blue);box-shadow:var(--gb);}
+.tl-i:nth-child(4) .tl-dot{background:var(--yellow);box-shadow:0 0 20px rgba(255,230,0,.4);}
+.tl-line{width:1px;flex:1;background:var(--border);margin-top:4px;}
+.tl-i:last-child .tl-line{display:none;}
+.tl-phase{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);margin-bottom:3px;text-transform:uppercase;}
+.tl-name{font-family:'Orbitron',monospace;font-weight:700;font-size:.98rem;margin-bottom:5px;}
+.tl-desc{font-size:.85rem;color:var(--muted);line-height:1.6;}
+
+/* ═══ AVATAR DROPDOWN ═══ */
+.av-dd{position:absolute;top:calc(100% + 8px);right:0;background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:8px;min-width:210px;z-index:300;animation:ddIn .2s cubic-bezier(.34,1.56,.64,1);}
+@keyframes ddIn{from{opacity:0;transform:translateY(-8px) scale(.96);}to{opacity:1;transform:none;}}
+.av-dd-user{padding:10px 12px 12px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+.av-dd-name{font-weight:700;font-size:.92rem;}
+.av-dd-email{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);margin-bottom:8px;}
+.av-dd-stats{display:flex;gap:14px;}
+.avds .n{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:var(--green);}
+.avds .l{font-size:.6rem;color:var(--muted);text-transform:uppercase;}
+.dd-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:.9rem;font-weight:600;background:none;border:none;color:var(--text);width:100%;text-align:left;}
+.dd-item:hover{background:rgba(255,255,255,.06);}
+.dd-item svg{width:16px;height:16px;color:var(--muted);}
+.dd-item.danger{color:var(--pink);}
+.dd-item.danger svg{color:var(--pink);}
+
+/* ═══ MODALS ═══ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);z-index:500;align-items:flex-end;justify-content:center;padding:0;}
+.overlay.open{display:flex;}
+@media(min-width:480px){.overlay{align-items:center;padding:20px;}}
+.modal{background:var(--s2);border:1px solid var(--border);border-top-left-radius:24px;border-top-right-radius:24px;padding:32px 24px;width:100%;max-width:420px;text-align:center;animation:mSlide .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes mSlide{from{opacity:0;transform:translateY(40px);}to{opacity:1;transform:none;}}
+@media(min-width:480px){.modal{border-radius:22px;animation:mPop .3s cubic-bezier(.34,1.56,.64,1);}}
+@keyframes mPop{from{opacity:0;transform:scale(.88) translateY(16px);}to{opacity:1;transform:none;}}
+.modal-drag{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:0 auto 20px;}
+@media(min-width:480px){.modal-drag{display:none;}}
+.modal-icon{font-size:2.8rem;margin-bottom:12px;}
+.modal-title{font-family:'Orbitron',monospace;font-weight:900;font-size:1.2rem;margin-bottom:7px;}
+.modal-sub{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:20px;}
+.modal-sub strong{color:var(--green);}
+.g-btn-wrap{margin-bottom:10px;min-height:44px;display:flex;justify-content:center;}
+.demo-btn{width:100%;padding:12px;border-radius:10px;background:linear-gradient(135deg,rgba(0,255,136,.14),rgba(0,212,255,.09));border:1px solid rgba(0,255,136,.3);color:var(--green);font-family:'Orbitron',monospace;font-size:.73rem;font-weight:700;letter-spacing:.08em;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.demo-btn:hover{box-shadow:var(--gg);}
+.divider{display:flex;align-items:center;gap:12px;margin:10px 0;color:var(--muted);font-size:.8rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.btn-ghost{width:100%;padding:11px;border-radius:10px;background:transparent;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{border-color:rgba(255,255,255,.2);color:var(--text);}
+
+/* Comment modal */
+.cm-modal{background:var(--s2);border:1px solid var(--border);border-top-left-radius:24px;border-top-right-radius:24px;width:100%;max-width:480px;overflow:hidden;animation:mSlide .3s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;max-height:80vh;}
+@media(min-width:480px){.cm-modal{border-radius:22px;max-height:70vh;animation:mPop .3s cubic-bezier(.34,1.56,.64,1);}}
+.cm-handle{width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);margin:16px auto 0;}
+@media(min-width:480px){.cm-handle{display:none;}}
+.cm-head{padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.cm-head-title{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:700;}
+.cm-list{flex:1;overflow-y:auto;padding:12px 20px;}
+.cm-list::-webkit-scrollbar{width:3px;}
+.cm-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.cm-empty{text-align:center;padding:32px 20px;color:var(--muted);font-size:.88rem;}
+.cm-item{display:flex;gap:10px;margin-bottom:14px;}
+.cm-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:.58rem;font-weight:700;flex-shrink:0;background:linear-gradient(135deg,var(--green),var(--blue));color:#000;}
+.cm-user{font-weight:700;font-size:.82rem;color:var(--green);}
+.cm-text{font-size:.86rem;color:rgba(240,240,255,.75);line-height:1.5;}
+.cm-time{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);}
+.cm-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;}
+.cm-input{flex:1;background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.93rem;font-weight:600;outline:none;transition:border-color .2s;}
+.cm-input:focus{border-color:rgba(0,255,136,.3);}
+.cm-post{padding:10px 16px;border-radius:10px;background:var(--green);color:#000;font-family:'Orbitron',monospace;font-size:.68rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.cm-post:hover{box-shadow:var(--gg);}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--bh) + var(--safe) + 14px);left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:.86rem;font-weight:600;white-space:nowrap;z-index:600;transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* DESKTOP */
+@media(min-width:768px){
+  .sidebar{display:flex;}
+  .bottom-nav,.top-bar{display:none;}
+  .app{padding-top:0;padding-bottom:0;left:var(--sw);}
+  #feed-view{scroll-snap-type:none;overflow-y:auto;}
+  .feed-header{scroll-snap-align:none;max-width:540px;margin:32px auto 0;}
+  .rame-card{height:auto;min-height:460px;max-width:540px;margin:0 auto 20px;border-radius:20px;border:1px solid var(--border);scroll-snap-align:none;padding-bottom:0;}
+  #feed-view{padding-bottom:40px;}
+  .toast{bottom:24px;}
+  .av-dd{right:auto;left:12px;top:calc(100% + 8px);}
+  .cm-modal{margin:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR (mobile) -->
+<header class="top-bar">
+  <a class="logo" href="#" onclick="showView('feed');return false">RAME<span>ING</span></a>
+  <div class="top-actions">
+    <button class="icon-btn" onclick="showView('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="icon-btn notif-wrap" onclick="showView('notifications')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="n-badge" id="nb1"></span>
+    </button>
+    <div style="position:relative;" id="top-auth">
+      <button id="top-join-btn" onclick="openModal('login-modal')" style="background:none;border:1px solid rgba(0,255,136,.35);color:var(--green);font-family:'Orbitron',monospace;font-size:.55rem;font-weight:700;letter-spacing:.08em;padding:6px 12px;border-radius:20px;cursor:pointer;transition:all .2s;">JOIN</button>
+      <button class="avatar-btn" id="top-av-btn" style="display:none" onclick="toggleDD()">
+        <div class="av-i" id="top-av-i">?</div>
+      </button>
+      <div class="av-dd" id="av-dd" style="display:none;">
+        <div class="av-dd-user">
+          <div class="av-dd-name" id="dd-name"></div>
+          <div class="av-dd-email" id="dd-email"></div>
+          <div class="av-dd-stats">
+            <div class="avds"><span class="n" id="dd-t">0</span><span class="l">Trophies</span></div>
+            <div class="avds"><span class="n" id="dd-f">0</span><span class="l">Followers</span></div>
+            <div class="avds"><span class="n" id="dd-fg">0</span><span class="l">Following</span></div>
+          </div>
+        </div>
+        <button class="dd-item" onclick="showView('profile');closeDD()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile
+        </button>
+        <button class="dd-item" onclick="showView('notifications');closeDD()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications
+        </button>
+        <button class="dd-item danger" onclick="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR (desktop) -->
+<nav class="sidebar" id="sidebar">
+  <a class="logo" href="#" onclick="showView('feed');return false">RAME<span>ING</span></a>
+  <div class="nav-links">
+    <button class="nav-link active" id="sb-feed" onclick="showView('feed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Feed
+    </button>
+    <button class="nav-link" id="sb-search" onclick="showView('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search
+    </button>
+    <button class="nav-link" id="sb-notifications" onclick="showView('notifications')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Alerts<span class="sb-badge" id="sb-nbadge"></span>
+    </button>
+    <button class="nav-link" id="sb-profile" onclick="showView('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+    </button>
+    <button class="nav-link" id="sb-vision" onclick="showView('vision')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Vision
+    </button>
+  </div>
+  <div id="sb-guest"><button class="sb-login-btn" onclick="openModal('login-modal')">SIGN IN / JOIN FREE</button></div>
+  <div id="sb-user" style="display:none;">
+    <div class="sb-user">
+      <div class="sb-user-row">
+        <div class="sb-av"><div class="av-i" id="sb-av-i"></div></div>
+        <div><div class="sb-name" id="sb-name"></div><div class="sb-handle" id="sb-handle"></div></div>
+      </div>
+      <div class="sb-stats">
+        <div class="sbs"><div class="n" id="sb-t">0</div><div class="l">Trophies</div></div>
+        <div class="sbs"><div class="n" id="sb-f">0</div><div class="l">Followers</div></div>
+        <div class="sbs"><div class="n" id="sb-fg">0</div><div class="l">Following</div></div>
+      </div>
+      <button class="sb-logout" onclick="logout()">SIGN OUT</button>
+    </div>
+  </div>
+</nav>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- ══ FEED VIEW ══ -->
+  <div id="feed-view" class="view active">
+    <!-- Snap point 0: header scrolls away revealing full card -->
+    <div class="feed-header">
+      <div class="feed-eyebrow"><span class="live-dot"></span>Live Now</div>
+      <h2 class="feed-title">Today's <span>Rames</span></h2>
+      <div class="chips">
+        <button class="chip on" onclick="filterChip(this)">🔥 All</button>
+        <button class="chip off" onclick="filterChip(this)">🎮 Action</button>
+        <button class="chip off" onclick="filterChip(this)">🏆 Trending</button>
+        <button class="chip off" onclick="filterChip(this)">⚡ New</button>
+        <button class="chip off" onclick="filterChip(this)">👥 Friends</button>
+      </div>
+    </div>
+
+    <!-- RAME 1 -->
+    <article class="rame-card" data-id="paper-defence">
+      <div class="rc-bg"></div><div class="rc-grid"></div>
+      <div class="rc-art">🛡️</div>
+      <div class="rc-content">
+        <div class="badge"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span> Tower Defense</div>
+        <h2 class="rc-title">Paper Defence</h2>
+        <p class="rc-desc">Build your paper fortress. Protect against endless waves of origami invaders in this addictive minimalist tower defense experience.</p>
+        <div class="rc-creator" onclick="openCreatorProfile()">
+          <div class="av-circle">PD</div>
+          <div class="rc-handle"><strong>@papercraft_dev</strong><span>rameing.com/papercraft_dev</span></div>
+        </div>
+        <div class="rc-stats">
+          <div class="stat-item">🏆 <span class="stat-n">2.4K</span><span class="stat-l">trophies</span></div>
+          <div class="stat-item">👥 <span class="stat-n">847</span><span class="stat-l">players</span></div>
+        </div>
+        <div class="rc-cta">
+          <a href="https://paperdefence.rameing.com" target="_blank" class="play-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>PLAY NOW
+          </a>
+          <button class="act-btn" id="like-paper-defence" onclick="toggleLike('paper-defence',this)" title="Like">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="act-btn" onclick="openComments('paper-defence','Paper Defence')" title="Comment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="act-btn" onclick="share('Paper Defence','https://paperdefence.rameing.com')" title="Share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="glow-bar"></div>
+    </article>
+
+    <!-- RAME 2 -->
+    <article class="rame-card" data-id="pd1">
+      <div class="rc-bg"></div><div class="rc-grid"></div>
+      <div class="rc-art">⚡</div>
+      <div class="rc-content">
+        <div class="badge"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span> Challenge</div>
+        <h2 class="rc-title">PD1</h2>
+        <p class="rc-desc">The ultimate skill challenge. How long can you last? Compete against friends and climb the global leaderboard. One shot. One chance.</p>
+        <div class="rc-creator" onclick="openCreatorProfile()">
+          <div class="av-circle">PD</div>
+          <div class="rc-handle"><strong>@papercraft_dev</strong><span>rameing.com/papercraft_dev</span></div>
+        </div>
+        <div class="rc-stats">
+          <div class="stat-item">🏆 <span class="stat-n">1.1K</span><span class="stat-l">trophies</span></div>
+          <div class="stat-item">👥 <span class="stat-n">432</span><span class="stat-l">players</span></div>
+        </div>
+        <div class="rc-cta">
+          <a href="https://pd1.rameing.com" target="_blank" class="play-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>PLAY NOW
+          </a>
+          <button class="act-btn" id="like-pd1" onclick="toggleLike('pd1',this)" title="Like">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="act-btn" onclick="openComments('pd1','PD1')" title="Comment">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="act-btn" onclick="share('PD1','https://pd1.rameing.com')" title="Share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="glow-bar"></div>
+    </article>
+  </div>
+
+  <!-- ══ SEARCH VIEW ══ -->
+  <div id="search-view" class="view" style="display:none">
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search Rames, creators…" id="search-input" oninput="handleSearch(this.value)" autocomplete="off">
+      </div>
+      <div class="chips">
+        <button class="chip on" onclick="filterChip(this)">All</button>
+        <button class="chip off" onclick="filterChip(this)">🎮 Rames</button>
+        <button class="chip off" onclick="filterChip(this)">👤 Creators</button>
+        <button class="chip off" onclick="filterChip(this)">🏆 Scores</button>
+      </div>
+    </div>
+    <div class="s-scroll">
+      <div id="s-results">
+        <div class="s-label">Rames</div>
+        <div class="s-grid">
+          <a href="https://paperdefence.rameing.com" target="_blank" class="s-card" data-s="paper defence tower defense">
+            <span class="s-card-em">🛡️</span>
+            <span class="s-card-name">Paper Defence</span>
+            <span class="s-card-sub">🏆 2.4K trophies · 847 players</span>
+          </a>
+          <a href="https://pd1.rameing.com" target="_blank" class="s-card" data-s="pd1 challenge skill">
+            <span class="s-card-em">⚡</span>
+            <span class="s-card-name">PD1</span>
+            <span class="s-card-sub">🏆 1.1K trophies · 432 players</span>
+          </a>
+        </div>
+        <div class="s-label">Creators</div>
+        <div id="creators-list">
+          <div class="creator-row" data-s="papercraft dev tower" onclick="openCreatorProfile()">
+            <div class="cr-av" style="background:linear-gradient(135deg,var(--green),#009952);color:#000;">PD</div>
+            <div style="flex:1;"><div class="cr-name">Papercraft Dev</div><div class="cr-sub">@papercraft_dev · 2 Rames</div></div>
+            <button class="follow-pill f0" id="s-follow-pd" onclick="event.stopPropagation();toggleFollow('papercraft_dev',this,false)">Follow</button>
+          </div>
+          <div class="creator-row" data-s="speedking top scorer">
+            <div class="cr-av" style="background:linear-gradient(135deg,var(--blue),#004499);color:#fff;">SK</div>
+            <div style="flex:1;"><div class="cr-name">SpeedKing</div><div class="cr-sub">@speedking · Top Scorer</div></div>
+            <button class="follow-pill f0" onclick="event.stopPropagation();toggleFollow('speedking',this,false)">Follow</button>
+          </div>
+          <div class="creator-row" data-s="neonhacker champion">
+            <div class="cr-av" style="background:linear-gradient(135deg,var(--pink),#8b0035);color:#fff;">NH</div>
+            <div style="flex:1;"><div class="cr-name">NeonHacker</div><div class="cr-sub">@neonhacker · Challenge Champion</div></div>
+            <button class="follow-pill f0" onclick="event.stopPropagation();toggleFollow('neonhacker',this,false)">Follow</button>
+          </div>
+        </div>
+      </div>
+      <div class="no-results" id="s-empty">
+        <div class="no-results-icon">🔍</div>
+        <div class="no-results-text">No results found</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NOTIFICATIONS VIEW ══ -->
+  <div id="notifications-view" class="view" style="display:none">
+    <div class="notifs-pad">
+      <div class="notifs-title">Notifications</div>
+      <div class="notif-group">Today</div>
+      <div class="notif-item unread"><div class="notif-av">🏆</div><div class="notif-body"><strong>Trophy Unlocked!</strong><br><span>You earned "First Visit" — welcome to Rameing.</span></div><div class="notif-time">2m</div></div>
+      <div class="notif-item unread"><div class="notif-av">⚡</div><div class="notif-body"><strong>New Rame dropped</strong><br><span>PD1 is live. Can you beat the high score?</span></div><div class="notif-time">1h</div></div>
+      <div class="notif-group">This Week</div>
+      <div class="notif-item"><div class="notif-av">👤</div><div class="notif-body"><strong>@speedking</strong><span> started following you.</span></div><div class="notif-time">2d</div></div>
+      <div class="notif-item"><div class="notif-av">💬</div><div class="notif-body"><strong>@neonhacker</strong><span> commented: "Insane level 7!"</span></div><div class="notif-time">3d</div></div>
+      <div class="notif-item"><div class="notif-av">🔥</div><div class="notif-body"><strong>Streak alert</strong><br><span>Play a Rame today to keep your 4-day streak alive.</span></div><div class="notif-time">4d</div></div>
+      <div class="notif-item"><div class="notif-av">🏆</div><div class="notif-body"><strong>Leaderboard</strong><br><span>@speedking just beat your Paper Defence high score.</span></div><div class="notif-time">5d</div></div>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE VIEW ══ -->
+  <div id="profile-view" class="view" style="display:none">
+    <div class="profile-inner">
+      <!-- Creator profile (public) -->
+      <div id="creator-profile">
+        <button class="back-btn" onclick="showView('feed')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back to feed
+        </button>
+        <div class="prof-head">
+          <div class="prof-av"><div class="av-i" style="font-size:1.4rem;">PD</div></div>
+          <div class="prof-name">Papercraft Dev</div>
+          <div class="prof-username">@papercraft_dev</div>
+          <div class="prof-bio">Building Rames one pixel at a time 🎮 Tower defense enthusiast. Always be playing.</div>
+          <div class="prof-stats">
+            <div class="pst"><span class="n">2</span><span class="l">Rames</span></div>
+            <div class="pst"><span class="n" id="cr-fol-n">1.2K</span><span class="l">Followers</span></div>
+            <div class="pst"><span class="n">3.5K</span><span class="l">Trophies</span></div>
+          </div>
+          <div class="prof-actions">
+            <button class="follow-big fol" id="cr-follow-btn" onclick="toggleFollow('papercraft_dev',this,true)">+ Follow</button>
+            <button class="msg-big" onclick="requireLogin()">Message</button>
+          </div>
+        </div>
+        <div class="game-grid">
+          <a href="https://paperdefence.rameing.com" target="_blank" class="game-card"><span class="gc-em">🛡️</span><span class="gc-name">Paper Defence</span><span class="gc-score">🏆 2,400</span></a>
+          <a href="https://pd1.rameing.com" target="_blank" class="game-card"><span class="gc-em">⚡</span><span class="gc-name">PD1</span><span class="gc-score">🏆 1,100</span></a>
+        </div>
+      </div>
+      <!-- Own profile -->
+      <div id="own-profile" style="display:none">
+        <div class="prof-head">
+          <div class="prof-av"><div class="av-i" id="own-av-i" style="font-size:1.4rem;">?</div></div>
+          <div class="prof-name" id="own-pname"></div>
+          <div class="prof-username" id="own-puname"></div>
+          <div class="prof-bio" id="own-pbio">New to Rameing. Let's play! 🎮</div>
+        </div>
+        <div class="own-stats-grid">
+          <div class="ops"><span class="n" id="own-t">0</span><span class="l">Trophies</span></div>
+          <div class="ops"><span class="n" id="own-f">0</span><span class="l">Followers</span></div>
+          <div class="ops"><span class="n" id="own-fg">0</span><span class="l">Following</span></div>
+        </div>
+        <div class="section-lbl">Liked Rames</div>
+        <div id="own-liked" class="game-grid"></div>
+        <button class="logout-btn" onclick="logout()">SIGN OUT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VISION VIEW ══ -->
+  <div id="vision-view" class="view" style="display:none">
+    <div class="vision-page">
+      <div class="v-eyebrow">// our.vision</div>
+      <h1 class="v-h1"><span class="g">Play.</span><br><span class="p">Challenge.</span><br><span class="b">Reign.</span></h1>
+      <p class="v-lead">Rameing is where games become social. Not just playing — competing, connecting, and building your legacy.</p>
+      <div class="v-quote"><p>Imagine if every game had a <strong>challenge</strong> attached to it. Beat the score. Survive longer. Then <strong>share it</strong>. Your friends try. Trophies stack. <strong>Streaks are born</strong>. Legends emerge from dorm rooms and late-night sessions. This is Rameing.</p></div>
+      <div class="v-grid">
+        <div class="v-card"><div class="v-card-icon">🏆</div><h3>Trophies</h3><p>Every Rame you crush earns trophies. Stack them. Your score is your reputation.</p></div>
+        <div class="v-card"><div class="v-card-icon">⚡</div><h3>Challenges</h3><p>Action-based social challenges that push your limits and set campus talking.</p></div>
+        <div class="v-card"><div class="v-card-icon">👥</div><h3>Followers</h3><p>Build your crew. Follow the best players. Rise from unknown to campus legend.</p></div>
+        <div class="v-card"><div class="v-card-icon">🔥</div><h3>Streaks</h3><p>Daily Rames keep your streak alive. Consistency is power.</p></div>
+      </div>
+      <div class="rm-lbl">// roadmap</div>
+      <div class="timeline">
+        <div class="tl-i"><div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-phase">Now — Phase 01</div><div class="tl-name">The Feed Goes Live</div><div class="tl-desc">Browse and play Rames. Public feed open to everyone.</div></div></div>
+        <div class="tl-i"><div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-phase">Coming — Phase 02</div><div class="tl-name">Trophies & Profiles</div><div class="tl-desc">Create your account. Earn trophies. Build your gaming legacy.</div></div></div>
+        <div class="tl-i"><div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-phase">Soon — Phase 03</div><div class="tl-name">Social Challenges</div><div class="tl-desc">Drop challenges on followers. Turn any Rame into a campus event.</div></div></div>
+        <div class="tl-i"><div class="tl-dot-col"><div class="tl-dot"></div><div class="tl-line"></div></div><div><div class="tl-phase">The Dream — Phase 04</div><div class="tl-name">Streaks & Creator Tools</div><div class="tl-desc">Daily Rames, streak rewards, and creator publishing tools.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav">
+  <button class="bn-item active" id="bn-feed" onclick="showView('feed')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Feed
+  </button>
+  <button class="bn-item" id="bn-search" onclick="showView('search')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search
+  </button>
+  <button class="bn-item" id="bn-notifications" onclick="showView('notifications')" style="position:relative;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="bn-badge" id="nb2"></span>Alerts
+  </button>
+  <button class="bn-item" id="bn-profile" onclick="showView('profile')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+  </button>
+  <button class="bn-item" id="bn-vision" onclick="showView('vision')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Vision
+  </button>
+</nav>
+
+<!-- LOGIN MODAL -->
+<div class="overlay" id="login-modal">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-icon">🎮</div>
+    <div class="modal-title">Join the Game</div>
+    <div class="modal-sub"><strong>Create a free account</strong> to like, comment, follow players, and start earning trophies.</div>
+    <div class="g-btn-wrap" id="g-btn-wrap"></div>
+    <div class="divider" id="g-divider" style="display:none">or</div>
+    <button class="demo-btn" onclick="demoLogin()">⚡ DEMO LOGIN (Test Mode)</button>
+    <button class="btn-ghost" onclick="closeModal('login-modal')">Maybe later</button>
+  </div>
+</div>
+
+<!-- COMMENT MODAL -->
+<div class="overlay" id="comment-modal">
+  <div class="cm-modal">
+    <div class="cm-handle"></div>
+    <div class="cm-head"><div class="cm-head-title" id="cm-title">Comments</div></div>
+    <div class="cm-list" id="cm-list"></div>
+    <div class="cm-input-row">
+      <input class="cm-input" type="text" placeholder="Add a comment…" id="cm-inp" maxlength="200" onkeydown="if(event.key==='Enter')postComment()">
+      <button class="cm-post" onclick="postComment()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ CONFIG ═══
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+
+// ═══ STATE ═══
+let user = null;
+let activeView = 'feed';
+let commentRame = null;
+const VIEWS = ['feed','search','notifications','profile','vision'];
+
+// ═══ STORAGE ═══
+const S = {
+  get: k => { try{ return JSON.parse(localStorage.getItem('rm_'+k)); }catch{ return null; } },
+  set: (k,v) => localStorage.setItem('rm_'+k, JSON.stringify(v)),
+};
+
+// ═══ BOOT ═══
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = S.get('user');
+  if (saved) { user = saved; }
+  updateUI();
+  restoreLikes();
+  setBadge(true);
+});
+
+// ═══ GOOGLE AUTH ═══
+function initGoogleAuth() {
+  if (GOOGLE_CLIENT_ID.includes('YOUR_') || !window.google) return;
+  try {
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogle });
+    google.accounts.id.renderButton(document.getElementById('g-btn-wrap'),
+      { theme:'filled_black', size:'large', width:280 });
+    document.getElementById('g-divider').style.display = 'flex';
+  } catch(e) {}
+}
+
+function onGoogle(r) {
+  try {
+    const p = JSON.parse(atob(r.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    login({ name:p.name, email:p.email, avatar:p.picture, src:'google' });
+  } catch { toast('Login error, try demo mode'); }
+}
+
+function demoLogin() {
+  const names = ['SpeedRamer','NeonKnight','GridRunner','ByteChaser','PixelKing'];
+  login({ name:names[Math.floor(Math.random()*names.length)], email:'demo@rameing.com', avatar:null, src:'demo' });
+}
+
+function login(u) {
+  user = u; S.set('user', u);
+  updateUI(); closeModal('login-modal');
+  toast(`Welcome, ${u.name.split(' ')[0]}! 🎮`);
+}
+
+function logout() {
+  user = null; S.set('user', null);
+  updateUI(); closeDD();
+  if (activeView==='profile') showView('feed');
+  toast('Signed out 👋');
+}
+
+// ═══ UPDATE UI ═══
+function updateUI() {
+  const loggedIn = !!user;
+  // top bar
+  document.getElementById('top-join-btn').style.display = loggedIn ? 'none' : '';
+  document.getElementById('top-av-btn').style.display = loggedIn ? '' : 'none';
+  // sidebar
+  document.getElementById('sb-guest').style.display = loggedIn ? 'none' : '';
+  document.getElementById('sb-user').style.display = loggedIn ? '' : 'none';
+
+  if (loggedIn) {
+    const ini = initials(user.name);
+    document.getElementById('top-av-i').textContent = ini;
+    document.getElementById('sb-av-i').textContent = ini;
+    document.getElementById('sb-name').textContent = user.name;
+    document.getElementById('sb-handle').textContent = '@'+slug(user.name);
+    document.getElementById('dd-name').textContent = user.name;
+    document.getElementById('dd-email').textContent = user.email;
+    const lk = likes().length, fl = follows().length;
+    setAll(['dd-t','sb-t'], lk*50);
+    setAll(['dd-f','sb-f'], 0);
+    setAll(['dd-fg','sb-fg'], fl);
+    syncOwnProfile();
+  }
+}
+
+function setAll(ids, val) { ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=val; }); }
+
+function initials(name) { return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+function slug(name) { return name.toLowerCase().replace(/\s+/g,''); }
+
+// ═══ NAVIGATION ═══
+function showView(v) {
+  VIEWS.forEach(id => {
+    const el = document.getElementById(id+'-view');
+    if (!el) return;
+    const on = id === v;
+    el.style.display = on ? 'flex' : 'none';
+    el.classList.toggle('active', on);
+  });
+  VIEWS.forEach(id => {
+    ['bn-','sb-'].forEach(p => {
+      const b = document.getElementById(p+id);
+      if (b) b.classList.toggle('active', id===v);
+    });
+  });
+  activeView = v; closeDD();
+  if (v==='profile') updateProfileView();
+  if (v==='notifications') { setBadge(false); S.set('notifs_seen',true); }
+}
+
+function updateProfileView() {
+  const showOwn = !!user;
+  document.getElementById('creator-profile').style.display = showOwn ? 'none' : '';
+  document.getElementById('own-profile').style.display = showOwn ? '' : 'none';
+  if (showOwn) syncOwnProfile();
+  // sync creator follow btn
+  const btn = document.getElementById('cr-follow-btn');
+  if (btn) {
+    const f = follows().includes('papercraft_dev');
+    btn.textContent = f ? '✓ Following' : '+ Follow';
+    btn.className = 'follow-big '+(f?'fing':'fol');
+  }
+}
+
+function openCreatorProfile() {
+  document.getElementById('creator-profile').style.display = '';
+  document.getElementById('own-profile').style.display = 'none';
+  showView('profile');
+  updateProfileView();
+}
+
+// ═══ DROPDOWN ═══
+function toggleDD() {
+  const dd = document.getElementById('av-dd');
+  dd.style.display = dd.style.display==='none' ? 'block' : 'none';
+}
+function closeDD() { document.getElementById('av-dd').style.display='none'; }
+document.addEventListener('click', e => { if (!e.target.closest('#top-auth')) closeDD(); });
+
+// ═══ LIKES ═══
+function likes() { return S.get('likes') || []; }
+function toggleLike(id, btn) {
+  if (!user) { openModal('login-modal'); return; }
+  const arr = likes(), i = arr.indexOf(id);
+  if (i===-1) { arr.push(id); setLikeBtn(btn,true); toast('❤️ Liked!'); }
+  else { arr.splice(i,1); setLikeBtn(btn,false); toast('Unliked'); }
+  S.set('likes', arr); updateUI();
+}
+function setLikeBtn(btn, on) {
+  btn.classList.toggle('liked', on);
+  const svg = btn.querySelector('svg');
+  svg.style.fill = on ? 'var(--pink)' : 'none';
+  svg.style.stroke = on ? 'var(--pink)' : 'currentColor';
+}
+function restoreLikes() {
+  likes().forEach(id => {
+    const btn = document.getElementById('like-'+id);
+    if (btn) setLikeBtn(btn, true);
+  });
+}
+
+// ═══ FOLLOWS ═══
+function follows() { return S.get('follows') || []; }
+function toggleFollow(handle, btn, isProfile) {
+  if (!user) { openModal('login-modal'); return; }
+  const arr = follows(), i = arr.indexOf(handle);
+  const add = i===-1;
+  if (add) { arr.push(handle); toast(`Following @${handle}! 👥`); }
+  else { arr.splice(i,1); toast(`Unfollowed @${handle}`); }
+  S.set('follows', arr);
+  // Sync all follow buttons for this handle
+  syncFollowBtns(handle, add);
+  updateUI();
+}
+function syncFollowBtns(handle, following) {
+  // Creator profile big btn
+  const cp = document.getElementById('cr-follow-btn');
+  if (cp && handle==='papercraft_dev') {
+    cp.textContent = following ? '✓ Following' : '+ Follow';
+    cp.className = 'follow-big '+(following?'fing':'fol');
+  }
+  // Search follow btn
+  if (handle==='papercraft_dev') {
+    const sf = document.getElementById('s-follow-pd');
+    if (sf) { sf.textContent=following?'Following':'Follow'; sf.className='follow-pill '+(following?'f1':'f0'); }
+  }
+  // Followers count mock
+  const el = document.getElementById('cr-fol-n');
+  if (el && handle==='papercraft_dev') el.textContent = follows().includes(handle)?'1.2K+1':'1.2K';
+}
+
+// ═══ OWN PROFILE ═══
+function syncOwnProfile() {
+  if (!user) return;
+  const ini = initials(user.name);
+  document.getElementById('own-av-i').textContent = ini;
+  document.getElementById('own-pname').textContent = user.name;
+  document.getElementById('own-puname').textContent = '@'+slug(user.name);
+  const lk = likes().length, fl = follows().length;
+  document.getElementById('own-t').textContent = lk*50||0;
+  document.getElementById('own-f').textContent = 0;
+  document.getElementById('own-fg').textContent = fl;
+  const all = [
+    {id:'paper-defence',em:'🛡️',name:'Paper Defence',score:'🏆 2,400',url:'https://paperdefence.rameing.com'},
+    {id:'pd1',em:'⚡',name:'PD1',score:'🏆 1,100',url:'https://pd1.rameing.com'},
+  ];
+  const liked = all.filter(g=>likes().includes(g.id));
+  const c = document.getElementById('own-liked');
+  c.innerHTML = liked.length===0
+    ? '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-size:.86rem;">No liked Rames yet — hit ❤️ on a card!</div>'
+    : liked.map(g=>`<a href="${g.url}" target="_blank" class="game-card"><span class="gc-em">${g.em}</span><span class="gc-name">${g.name}</span><span class="gc-score">${g.score}</span></a>`).join('');
+}
+
+// ═══ COMMENTS ═══
+function getComments(id) { return S.get('cm_'+id)||[]; }
+function openComments(id, name) {
+  commentRame = id;
+  document.getElementById('cm-title').textContent = '💬 '+name;
+  renderComments(); document.getElementById('cm-inp').value='';
+  openModal('comment-modal');
+}
+function renderComments() {
+  const list = getComments(commentRame);
+  const el = document.getElementById('cm-list');
+  el.innerHTML = list.length===0
+    ? '<div class="cm-empty">No comments yet. Be the first! 🎮</div>'
+    : list.map(c=>`<div class="cm-item"><div class="cm-av">${c.ini}</div><div><div class="cm-user">${esc(c.user)}</div><div class="cm-text">${esc(c.text)}</div><div class="cm-time">${c.time}</div></div></div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function postComment() {
+  if (!user) { closeModal('comment-modal'); openModal('login-modal'); return; }
+  const inp = document.getElementById('cm-inp');
+  const txt = inp.value.trim(); if (!txt) return;
+  const arr = getComments(commentRame);
+  arr.push({ user:user.name.split(' ')[0], ini:initials(user.name), text:txt, time:'just now' });
+  S.set('cm_'+commentRame, arr); inp.value='';
+  renderComments(); toast('Comment posted! 💬');
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══ SHARE ═══
+function share(name, url) {
+  if (navigator.share) navigator.share({title:name+' on Rameing',url}).catch(()=>{});
+  else navigator.clipboard.writeText(url).then(()=>toast('Link copied! 🔗')).catch(()=>toast(url));
+}
+
+// ═══ SEARCH ═══
+function handleSearch(q) {
+  q = q.toLowerCase().trim();
+  const cards = document.querySelectorAll('.s-card,.creator-row');
+  let found = 0;
+  cards.forEach(c => {
+    const match = !q || (c.dataset.s||c.textContent.toLowerCase()).includes(q);
+    c.style.display = match ? '' : 'none';
+    if (match) found++;
+  });
+  document.getElementById('s-results').style.display = (!q||found)? '' : 'none';
+  document.getElementById('s-empty').style.display = (q&&!found) ? 'block' : 'none';
+}
+
+function filterChip(el) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>{c.className='chip off';});
+  el.className='chip on';
+}
+
+// ═══ MODAL HELPERS ═══
+function requireLogin() { openModal('login-modal'); }
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(m=>m.classList.remove('open')); });
+
+// ═══ TOAST ═══
+let tt;
+function toast(msg) {
+  const t = document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ═══ NOTIF BADGE ═══
+function setBadge(on) {
+  ['nb1','nb2','sb-nbadge'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display=on?'':'none'; });
+}
+</script>
+</body>
+</html>
