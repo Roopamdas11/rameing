@@ -113,6 +113,13 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .rame-card:nth-child(2) .av-circle{background:linear-gradient(135deg,var(--pink),#8b0035);color:#fff;}
 .rame-card:nth-child(1) .glow-bar{background:linear-gradient(90deg,transparent,var(--green),transparent);}
 .rame-card:nth-child(2) .glow-bar{background:linear-gradient(90deg,transparent,var(--pink),transparent);}
+.rame-card:nth-child(3) .rc-bg{background:radial-gradient(ellipse at 20% 20%,rgba(0,212,255,.14) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(0,100,200,.09) 0%,transparent 60%),linear-gradient(160deg,#0a0f18,#05080a);}
+.rame-card:nth-child(3) .badge{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--blue);}
+.rame-card:nth-child(3) .stat-n{color:var(--blue);}
+.rame-card:nth-child(3) .play-btn{background:var(--blue);color:#fff;box-shadow:0 0 28px rgba(0,212,255,.35);}
+.rame-card:nth-child(3) .play-btn:hover{box-shadow:0 0 50px rgba(0,212,255,.55);transform:scale(1.03);}
+.rame-card:nth-child(3) .av-circle{background:linear-gradient(135deg,var(--blue),#004d99);color:#fff;}
+.rame-card:nth-child(3) .glow-bar{background:linear-gradient(90deg,transparent,var(--blue),transparent);}
 
 .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:20px;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;width:fit-content;}
 .rc-title{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(1.8rem,7vw,2.8rem);line-height:1.05;margin-bottom:12px;}
@@ -213,6 +220,15 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .section-lbl{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-bottom:12px;margin-top:4px;}
 .logout-btn{display:block;width:100%;padding:10px;border-radius:10px;background:rgba(255,45,120,.08);color:var(--pink);font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;letter-spacing:.08em;border:1px solid rgba(255,45,120,.2);cursor:pointer;transition:all .2s;margin-top:14px;}
 .logout-btn:hover{background:rgba(255,45,120,.16);}
+
+/* ═══ COMING SOON / MOCKED ═══ */
+.coming-soon{position:relative;opacity:.55;cursor:not-allowed;pointer-events:none;}
+.coming-soon:hover{opacity:.55;}
+.coming-soon-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:8px 14px;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;color:var(--yellow);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;z-index:10;}
+.mocked-btn{position:relative;opacity:.6;}
+.mocked-btn::after{content:'';position:absolute;inset:0;pointer-events:none;}
+[data-tooltip]{position:relative;}
+[data-tooltip]:hover::after{content:attr(data-tooltip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:1px solid rgba(0,212,255,.3);color:var(--blue);padding:6px 12px;border-radius:8px;font-family:'Space Mono',monospace;font-size:.65rem;white-space:nowrap;z-index:100;pointer-events:none;}
 
 /* ═══ VISION ═══ */
 .vision-page{padding:32px 20px 60px;max-width:680px;margin:0 auto;}
@@ -498,6 +514,41 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div class="glow-bar"></div>
     </article>
+
+    <!-- RAME 3 (new): Tower Climber (Coming Soon) -->
+    <article class="rame-card coming-soon" data-id="tower-climber">
+      <div class="rc-bg"></div><div class="rc-grid"></div>
+      <div class="rc-art">🏔️</div>
+      <div class="rc-content">
+        <img class="rc-poster" src="assets/poster-tower-climber.svg" alt="Tower Climber Poster">
+        <div class="badge"><span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span> Adventure</div>
+        <h2 class="rc-title">Tower Climber</h2>
+        <p class="rc-desc">Ascend endless towers in this fast-paced platformer. Jump, slide, and survive against gravity itself. Master the climb and reach the apex.</p>
+        <div class="rc-creator" onclick="openCreatorProfile()">
+          <div class="av-circle">TC</div>
+          <div class="rc-handle"><strong>@tower_dev</strong><span>rameing.com/tower_dev</span></div>
+        </div>
+        <div class="rc-stats">
+          <div class="stat-item">🏆 <span class="stat-n">850</span><span class="stat-l">trophies</span></div>
+          <div class="stat-item">👥 <span class="stat-n">320</span><span class="stat-l">players</span></div>
+        </div>
+        <div class="rc-cta">
+          <button class="play-btn" data-tooltip="Coming soon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>PLAY NOW
+          </button>
+          <button class="act-btn" data-tooltip="Coming soon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="act-btn" data-tooltip="Coming soon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="act-btn" data-tooltip="Coming soon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="glow-bar"></div>
+    </article>
   </div>
 
   <!-- ══ SEARCH VIEW ══ -->
@@ -527,6 +578,11 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <span class="s-card-em">⚡</span>
             <span class="s-card-name">PD1</span>
             <span class="s-card-sub">🏆 1.1K trophies · 432 players</span>
+          </a>
+          <a href="#" class="s-card coming-soon" data-tooltip="Coming soon" data-s="tower climber ascend">
+            <span class="s-card-em">🏔️</span>
+            <span class="s-card-name">Tower Climber</span>
+            <span class="s-card-sub">🏆 -- trophies · -- players</span>
           </a>
         </div>
         <div class="s-label">Creators</div>
@@ -590,7 +646,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
           </div>
           <div class="prof-actions">
             <button class="follow-big fol" id="cr-follow-btn" onclick="toggleFollow('papercraft_dev',this,true)">+ Follow</button>
-            <button class="msg-big" onclick="requireLogin()">Message</button>
+            <button class="msg-big mocked-btn" onclick="requireLogin()" data-tooltip="Coming soon">Message</button>
           </div>
         </div>
         <div class="game-grid">
@@ -900,6 +956,7 @@ function syncOwnProfile() {
   const all = [
     {id:'paper-defence',em:'🛡️',name:'Paper Defence',score:'🏆 2,400',url:'https://paperdefence.rameing.com'},
     {id:'pd1',em:'⚡',name:'PD1',score:'🏆 1,100',url:'https://pd1.rameing.com'},
+    {id:'tower-climber',em:'🏔️',name:'Tower Climber',score:'🏆 850',url:null,comingSoon:true},
   ];
   const liked = all.filter(g=>likes().includes(g.id));
   const c = document.getElementById('own-liked');
